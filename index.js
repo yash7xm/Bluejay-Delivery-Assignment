@@ -80,10 +80,10 @@ fs.createReadStream(DATA_FILE)
       consecutiveDays = 1;
 
       const pid =  employee.PositionId;
-      const fileNum = employee.FileNumber
+      const name = employee.EmployeeName
       employeesWorkedForSevenConsecutiveDays.push({
         pid,
-        fileNum
+        name
       })
     }
   }
