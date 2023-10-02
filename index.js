@@ -7,24 +7,18 @@ const employees = [];
 // Function to process each CSV row and store employee data
 function processCSVRow(row) {
   const PositionId = row['Position ID'];
-  const PositionStatus = row['Position Status'];
   const TimeIn = row['Time'];
   const TimeOut = row['Time Out'];
   const TimeCard = row['Timecard Hours (as Time)'];
-  const PayCycleStartDate = row['Pay Cycle Start Date'];
-  const PayCycleEndDate = row['Pay Cycle End Date'];
   const EmployeeName = row['Employee Name'];
   const FileNumber = row['File Number'];
 
   // Store data in an array of employees
   employees.push({
     PositionId,
-    PositionStatus,
     TimeIn,
     TimeOut,
     TimeCard,
-    PayCycleStartDate,
-    PayCycleEndDate,
     EmployeeName,
     FileNumber,
   });
@@ -126,15 +120,6 @@ function findEmployeesWithShorterShifts() {
   console.log('Employees with shorter shifts (1-10 hours between):', employeesWithShorterShifts);
 }
 
-// Function to calculate the time difference between two time strings
-function calculateTimeDifference(timeStr1, timeStr2) {
-  const time1 = new Date(`01/01/2023 ${timeStr1}`);
-  const time2 = new Date(`01/01/2023 ${timeStr2}`);
-  const timeDifferenceMilliseconds = Math.abs(time1 - time2);
-  const timeDifferenceHours = timeDifferenceMilliseconds / (60 * 60 * 1000);
-  return timeDifferenceHours;
-}
-
 // Function to find employees who have worked for more than 14 hours in a single shift
 function findEmployeesWithLongShifts() {
   let employeesWithLongShifts = [];
@@ -164,4 +149,13 @@ function findEmployeesWithLongShifts() {
     }
   }
   console.log('Employees with long shifts (more than 14 hours):', employeesWithLongShifts);
+}
+
+// Function to calculate the time difference between two time strings
+function calculateTimeDifference(timeStr1, timeStr2) {
+  const time1 = new Date(`01/01/2023 ${timeStr1}`);
+  const time2 = new Date(`01/01/2023 ${timeStr2}`);
+  const timeDifferenceMilliseconds = Math.abs(time1 - time2);
+  const timeDifferenceHours = timeDifferenceMilliseconds / (60 * 60 * 1000);
+  return timeDifferenceHours;
 }
