@@ -36,6 +36,8 @@ fs.createReadStream(DATA_FILE)
   .on('data', processCSVRow)
   .on('end', () => {
     findEmployeesWithConsecutiveDays();
+    findEmployeesWithShorterShifts();
+    findEmployeesWithLongShifts();
   })
   .on('error', (err) => {
     console.error('Error reading CSV file:', err);
@@ -89,6 +91,89 @@ fs.createReadStream(DATA_FILE)
   }
   console.log(employeesWorkedForSevenConsecutiveDays);
  }
+
+ function findEmployeesWithShorterShifts() {
+
+
+    let employeesWithShorterShifts = [];
+    let fileNo = employees[0].FileNumber;
+
+    for(let i=0; i<employees.length - 1; i++){
+      let shiftA = employees[i];
+      let shiftB = employees[i+1];
+
+      if(shiftA.FileNumber !== shiftB.FileNumber) {
+        continue;
+      }
+
+      const timeStr1 = shiftA.TimeOut.substring(11);
+      const timeStr2 = shiftB.TimeIn.substring(11)
+
+      let timeBetweenShifts = calculateTimeDifference(timeStr1, timeStr2);
+  
+      if(timeBetweenShifts > 1 && timeBetweenShifts < 10) {
+        const pid = employees[i].PositionId;
+        const name = employees[i].EmployeeName;
+
+        employeesWithShorterShifts.push({
+          pid,
+          name
+        });
+
+        let currentFileNo = employees[i].FileNumber;
+        while(currentFileNo == employees[i].FileNumber){
+          i++;
+        }
+      }
+    }
+    console.log(employeesWithShorterShifts);
+ }
+
+
+ function calculateTimeDifference(timeStr1, timeStr2) {
+  // Parse the time strings into Date objects for comparison
+  const time1 = new Date(`01/01/2023 ${timeStr1}`);
+  const time2 = new Date(`01/01/2023 ${timeStr2}`);
+
+  // Calculate the time difference in milliseconds
+  const timeDifferenceMilliseconds = Math.abs(time1 - time2);
+
+  // Convert the time difference to hours
+  const timeDifferenceHours = timeDifferenceMilliseconds / (60 * 60 * 1000);
+
+  return timeDifferenceHours;
+}
+
+function findEmployeesWithLongShifts() {
+  let employeesWithLongShifts = [];
+  let fileNo = employees[0].FileNumber;
+
+  for(let i=0; i<employees.length; i++) {
+   
+
+    if(fileNo !== employees[i].FileNumber){
+      continue;
+    }
+    const [hours, minutes] = employees[i].TimeCard.split(':').map(Number);
+    const totalHours = hours + minutes/60;
+    
+    if(totalHours > 14) {
+      const pid =  employees[i].PositionId;
+      const name = employees[i].EmployeeName
+      employeesWithLongShifts.push({
+        pid,
+        name
+      })
+    }
+
+    let currentFileNo = employees[i].FileNumber;
+    while(currentFileNo == employees[i].FileNumber){
+      i++;
+    }
+    
+  }
+  console.log(employeesWithLongShifts);
+}
 
  
 
