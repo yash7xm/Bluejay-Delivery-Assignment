@@ -24,6 +24,7 @@ function processCSVRow(row) {
     TimeIn,
     TimeOut,
     TimeCard,
+    PayCycleStartDate,
     PayCycleEndDate,
     EmployeeName,
     FileNumber,
@@ -34,14 +35,61 @@ fs.createReadStream(DATA_FILE)
   .pipe(csv())
   .on('data', processCSVRow)
   .on('end', () => {
-    showData();
+    findEmployeesWithConsecutiveDays();
   })
   .on('error', (err) => {
     console.error('Error reading CSV file:', err);
   });
 
- function showData() {
-    console.log(employees[1]);
+ function findEmployeesWithConsecutiveDays() {
+  let nextDate = null;
+  let currDate = null;
+  let fileNo = employees[0].FileNumber;
+  let consecutiveDays = 1;
+  let employeesWorkedForSevenConsecutiveDays = [];
+  
+  for (let employee of employees) {
+
+    if(fileNo != employee.FileNumber){
+      fileNo = employee.FileNumber;
+      nextDate = null;
+      currDate = null;
+      consecutiveDays = 1;
+      continue;
+    }
+
+    currDate = employee.TimeIn.substring(0, 10);
+    currDate = new Date(currDate);
+  
+    if (nextDate === null) {
+      nextDate = new Date(currDate);
+      nextDate.setDate(currDate.getDate() + 1);
+      consecutiveDays = 1;
+    } else {
+      if (currDate.getDate() === nextDate.getDate()) {
+        nextDate.setDate(currDate.getDate() + 1);
+        consecutiveDays++;
+      } else {
+        nextDate = null;
+        consecutiveDays = 1;
+      }
+    }
+    
+    if (consecutiveDays === 7) {
+      nextDate = null;
+      consecutiveDays = 1;
+
+      const pid =  employee.PositionId;
+      const fileNum = employee.FileNumber
+      employeesWorkedForSevenConsecutiveDays.push({
+        pid,
+        fileNum
+      })
+    }
+  }
+  console.log(employeesWorkedForSevenConsecutiveDays);
  }
+
+ 
 
 
